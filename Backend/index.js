@@ -11,7 +11,7 @@ const mongodbUrl = process.env.MONGODB_URL
 
 
 import notesRoutes from './routes/notesRoutes.js'
-const port = 5002
+const port = process.env.PORT | 5002
  
 app.use(express.json())
 app.use(cors())
