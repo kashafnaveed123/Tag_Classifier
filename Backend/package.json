@@ -1,0 +1,32 @@
+{
+  "name": "mern-series",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@huggingface/inference": "^4.9.0",
+    "axios": "^1.11.0",
+    "body-parser": "^1.20.3",
+    "compromise": "^14.14.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "form-data": "^4.0.4",
+    "mongoose": "^8.18.2",
+    "multer": "^2.0.2",
+    "node": "^22.12.0",
+    "nodemon": "^3.1.7",
+    "openai": "^4.85.1",
+    "start": "^5.1.0",
+    "stripe": "^18.0.0"
+  }
+}
