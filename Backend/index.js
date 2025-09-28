@@ -7,8 +7,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const mongodbUrl = process.env.MONGODB_URL
-
+const mongodbUrl = process.env.MONGO_URL ||'mongodb+srv://222kashafnaveed:kashafnaveed@cluster0.vdp24.mongodb.net/SampleBackend?retryWrites=true&w=majority'
+console.log(mongodbUrl)
 
 import notesRoutes from './routes/notesRoutes.js'
 const port = process.env.PORT | 5002
