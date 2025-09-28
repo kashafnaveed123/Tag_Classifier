@@ -8,10 +8,12 @@ export default function UI() {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const API_BASE = "https://tagclassifier-production.up.railway.app";
+
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const res = await fetch("http://localhost:5002/notes");
+        const res = await fetch(`${API_BASE}/notes`);
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
@@ -32,15 +34,15 @@ export default function UI() {
   // Calculate global top tags from all notes
   const calculateGlobalTopTags = (notesData) => {
     if (!notesData || !Array.isArray(notesData)) return;
-    
-    const allTags = notesData.flatMap(note => 
+
+    const allTags = notesData.flatMap(note =>
       (note.tags || []).map(tag => ({
         label: tag.label,
         score: tag.score,
         noteId: note._id
       }))
     );
-    
+
     const tagMap = {};
     allTags.forEach(tag => {
       if (!tagMap[tag.label]) {
@@ -55,7 +57,7 @@ export default function UI() {
       tagMap[tag.label].count += 1;
       tagMap[tag.label].notes.add(tag.noteId);
     });
-    
+
     const globalTags = Object.values(tagMap)
       .map(tag => ({
         label: tag.label,
@@ -65,7 +67,7 @@ export default function UI() {
       }))
       .sort((a, b) => b.averageScore * b.frequency - a.averageScore * a.frequency)
       .slice(0, 10);
-    
+
     setGlobalTopTags(globalTags);
   };
 
@@ -75,22 +77,22 @@ export default function UI() {
 
     try {
       let res, data;
-      
+
       if (editingId) {
         // Update (PATCH)
-        res = await fetch(`http://localhost:5002/notes/${editingId}`, {
+        res = await fetch(`${API_BASE}/notes/${editingId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ title, description }),
         });
-        
+
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
-        
+
         data = await res.json();
         console.log("Update response:", data);
-        
+
         if (data.data) {
           setNotes(prev => {
             const updated = prev.map(n => n._id === editingId ? data.data : n);
@@ -101,19 +103,19 @@ export default function UI() {
         setEditingId(null);
       } else {
         // Create (POST)
-        res = await fetch("http://localhost:5002/notes", {
+        res = await fetch(`${API_BASE}/notes`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ title, description }),
         });
-        
+
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
-        
+
         data = await res.json();
         console.log("Create response:", data);
-        
+
         if (data.data) {
           setNotes(prev => {
             const updated = [data.data, ...prev];
@@ -135,7 +137,7 @@ export default function UI() {
   // Delete note
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5002/notes/${id}`, {
+      const res = await fetch(`${API_BASE}/notes/${id}`, {
         method: "DELETE",
       });
 
@@ -165,14 +167,14 @@ export default function UI() {
     setEditingId(note._id);
   };
 
-  // Real-time tag preview (optional - you can remove this if not needed)
+  // Real-time tag preview 
   const fetchTags = async (text) => {
     try {
       if (!text) {
         return;
       }
 
-      const res = await fetch("http://localhost:5002/tags/generate-tags", {
+      const res = await fetch(`${API_BASE}/notes/tags/generate-tags`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text })
@@ -184,10 +186,9 @@ export default function UI() {
 
       const data = await res.json();
       console.log("Real-time tags preview:", data);
-      // You can use this data for real-time preview if you want
     } catch (err) {
       console.error("Error fetching tags for preview:", err);
-      // Don't show error to user for preview functionality
+
     }
   };
 
@@ -273,7 +274,7 @@ export default function UI() {
                         </span>
                       </span>
                     )}
-                    
+
                     {/* Top Tag (Second Highlight) */}
                     {note.top_tag && !note.star_tag && (
                       <span className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
@@ -283,7 +284,7 @@ export default function UI() {
                         </span>
                       </span>
                     )}
-                    
+
                     {/* Other Tags */}
                     {note.tags && note.tags.map((tag, index) => {
                       // Skip the first tag if it's already displayed as star/top tag
@@ -291,7 +292,7 @@ export default function UI() {
                         return null;
                       }
                       return (
-                        <span 
+                        <span
                           key={index}
                           className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs flex items-center"
                         >
@@ -302,13 +303,13 @@ export default function UI() {
                         </span>
                       );
                     })}
-                    
+
                     {/* Fallback for notes without tags */}
                     {(!note.tags || note.tags.length === 0) && (
                       <span className="text-gray-400 text-xs">No tags generated</span>
                     )}
                   </div>
-                  
+
                   {/* Tag Statistics */}
                   {note.tags && note.tags.length > 0 && (
                     <div className="mt-2 text-xs text-gray-500">
@@ -335,11 +336,11 @@ export default function UI() {
                     🗑️ Delete
                   </button>
                 </div>
-                
+
                 {/* Created/Updated Time */}
                 <div className="mt-2 text-xs text-gray-400">
-                  {note.updatedAt ? 
-                    `Updated: ${new Date(note.updatedAt).toLocaleDateString()}` : 
+                  {note.updatedAt ?
+                    `Updated: ${new Date(note.updatedAt).toLocaleDateString()}` :
                     `Created: ${new Date(note.createdAt).toLocaleDateString()}`
                   }
                 </div>
@@ -368,7 +369,7 @@ export default function UI() {
               </li>
             ))}
           </ul>
-          
+
           {globalTopTags.length === 0 && !loading && (
             <p className="text-gray-500 text-sm text-center py-4">
               No tags yet. Create some notes!
